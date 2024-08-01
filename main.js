@@ -1,45 +1,19 @@
-import linkedList from "./linked-list/methods.js";
+import HashMap from "./hash-map/hash-map.js";
 
-const list = linkedList();
+let test = HashMap();
+test.set("apple", "red");
+test.set("banana", "yellow");
+test.set("carrot", "orange");
+test.set("dog", "brown");
+test.set("elephant", "gray");
+test.set("frog", "green");
+test.set("grape", "purple");
+test.set("hat", "black");
+test.set("ice cream", "white");
+test.set("jacket", "blue");
+test.set("kite", "pink");
+test.set("lion", "golden");
 
-list.append('horse')
-list.append('dog')
-list.append('cat')
-list.prepend('weasel')
-list.prepend('donkey')
+// Uncomment to expand the map size
+//test.set("moon", "silver")
 
-console.log(list.toString());
-// donkey, weasel, horse, dog, cat
-
-console.log(list.size());
-// 5
-
-console.log(list.head())
-// donkey
-
-console.log(list.tail())
-// cat
-
-console.log(list.at(2))
-// horse
-
-console.log(list.pop())
-console.log(list.toString())
-// donkey, weasel, horse, dog
-
-console.log(list.contains('weasel'))
-// true
-console.log(list.contains('frog'))
-// false
-
-console.log(list.find('weasel'))
-// 1 
-console.log(list.find('frog'))
-// null
-
-console.log(list.insertAt('frog', 1))
-console.log(list.toString())
-// donkey, frog, weasel, horse, dog
-console.log(list.removeAt(2))
-console.log(list.toString())
-// donkey, frog, horse, dog

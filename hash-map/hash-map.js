@@ -1,8 +1,10 @@
+import LinkedList from "../linked-list/methods.js";
+
 export default function HashMap() {
   let buckets = new Array(16);
   const loadFactor = 0.75;
 
-  function hash(key) {
+  const hash = function(key) {
     let hashCode = 0;
     const primeNumber = 31;
     for (let i = 0; i < key.length; i++) {
@@ -14,15 +16,31 @@ export default function HashMap() {
 
   function set(key, value) {
     const index = hash(key);
-    buckets[index] = { key: key, value: value };
+    const pair = { key: key, value: value };
+    let list = LinkedList();
+
+    // Check for value or object {value: null} in linked list head
+    if (!buckets[index] || !buckets[index].value) {
+      buckets[index] = list.append(pair);
+    } else {
+      buckets[index].next = list.append(pair);
+    }
+
+    // Expand buckets
     let entries = [];
     for (let i = 0; i < buckets.length; i++) {
-      if (buckets[i]) entries.push(buckets[i]);
+      let pointer = buckets[i]
+      while (pointer !== undefined && pointer !== null) {
+        entries.push([pointer.value.key, pointer.value.value])
+        pointer = pointer.next
+      }
     }
+
+    // Reset buckets
     if (entries.length >= buckets.length * loadFactor) {
       buckets = new Array(buckets.length * 2);
       entries.forEach((entry) => {
-        set(entry.key, entry.value);
+        set(entry[0], entry[1]);
       });
     }
   }
@@ -32,7 +50,11 @@ export default function HashMap() {
     if (index < 0 || index >= buckets.length) {
       throw new Error("Trying to access index out of bound.");
     }
-    if (buckets[index].key === key) return buckets[index].value;
+    let bucket = buckets[index]
+    while (bucket.value.key !== key && bucket.next) {
+      bucket = bucket.next;
+    }
+    if (bucket.value.key === key) return bucket.value.value;
     return null;
   }
 
@@ -41,7 +63,11 @@ export default function HashMap() {
     if (index < 0 || index >= buckets.length) {
       throw new Error("Trying to access index out of bound.");
     }
-    if (buckets[index].key === key) return true;
+    let bucket = buckets[index];
+    while (bucket.value.key !== key && bucket.next) {
+      bucket = bucket.next;
+    }
+    if (bucket.value.key === key) return true;
     return false;
   }
 
@@ -50,29 +76,56 @@ export default function HashMap() {
     if (index < 0 || index >= buckets.length) {
       throw new Error("Trying to access index out of bound.");
     }
-    if (buckets[index]) {
-      buckets[index] = "";
+    let bucket = buckets[index];
+    let prev = undefined;
+    while (bucket.value.key !== key && bucket.next) {
+      prev = bucket;
+      bucket = bucket.next;
+    }
+    if (bucket.value.key === key) {
+      if (prev) prev.next = bucket.next;
+      bucket.value = null;
       return true;
     }
-    return false;
+    return null;
   }
 
-  function length() {
-    let values = [];
+  function size() {
+    let count = 0;
     for (let i = 0; i < buckets.length; i++) {
-      if (buckets[i]) values.push(buckets[i]);
+      let pointer = buckets[i]
+      while (pointer !== undefined && pointer !== null) {
+        count++;
+        pointer = pointer.next
+      }
     }
-    return values.length;
+    return count;
   }
 
   function clear() {
     buckets = new Array(16);
   }
 
+  function keys() {
+    let keys = [];
+    for (let i = 0; i < buckets.length; i++) {
+      let pointer = buckets[i]
+      while (pointer !== undefined && pointer !== null) {
+        keys.push(pointer.value.key)
+        pointer = pointer.next
+      }
+    }
+    return keys;
+  }
+
   function values() {
     let values = [];
     for (let i = 0; i < buckets.length; i++) {
-      if (buckets[i]) values.push(buckets[i].value);
+      let pointer = buckets[i]
+      while (pointer !== undefined && pointer !== null) {
+        values.push(pointer.value.value)
+        pointer = pointer.next
+      }
     }
     return values;
   }
@@ -80,10 +133,14 @@ export default function HashMap() {
   function entries() {
     let entries = [];
     for (let i = 0; i < buckets.length; i++) {
-      if (buckets[i]) entries.push(buckets[i]);
+      let pointer = buckets[i]
+      while (pointer !== undefined && pointer !== null) {
+        entries.push([pointer.value.key, pointer.value.value])
+        pointer = pointer.next
+      }
     }
     return entries;
   }
 
-  return { hash, set, get, has, remove, length, clear, values, entries };
+  return { set, get, has, remove, size, clear, keys, values, entries };
 }

@@ -1,6 +1,6 @@
 import newNode from "./new-node.js";
 
-export default function linkedList() {
+export default function LinkedList() {
   let HEAD = null;
   let length = 0;
 
